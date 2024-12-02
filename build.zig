@@ -5,7 +5,7 @@ const Step = std.build.Step;
 pub fn build(b: *std.Build) !void {
     // Default target and optimize mode
     const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{});
+    const optimize = b.standardOptimizeOption(.{ .preferred_optimize_mode = .Debug });
 
     // Create a module for io.zig that can be shared across executables
     const io_module = b.addModule("io", .{
