@@ -1,18 +1,24 @@
 const std = @import("std");
-const io = @import("io.zig");
+const io = @import("io");
 
 const stdout = std.io.getStdOut().writer();
+
 pub fn main() !void {
     // const stdout = std.io.getStdOut().writer();
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
 
-    try stdout.print("p1: {}\n", .{try p1(allocator)});
-    try stdout.print("p2: {}\n", .{try p2(allocator)});
+    const dir_path = comptime std.fs.path.dirname(@src().file) orelse ".";
+    const input_file = dir_path ++ "/" ++ "input.txt";
+
+    try stdout.print("{s}\n", .{dir_path});
+    try stdout.print("p1: {}\n", .{try p1(allocator, input_file)});
+    try stdout.print("p2: {}\n", .{try p2(allocator, input_file)});
+    try stdout.print("---------------------------\n", .{});
 }
 
-pub fn p1(allocator: std.mem.Allocator) !i32 {
-    const a = try io.read_input(allocator, "src/input.txt");
+pub fn p1(allocator: std.mem.Allocator, input_file: []const u8) !i32 {
+    const a = try io.read_input(allocator, input_file);
     defer allocator.free(a);
     var l1 = std.ArrayList(i32).init(allocator);
     var l2 = std.ArrayList(i32).init(allocator);
@@ -41,8 +47,8 @@ pub fn p1(allocator: std.mem.Allocator) !i32 {
     return sum;
 }
 
-pub fn p2(allocator: std.mem.Allocator) !i32 {
-    const a = try io.read_input(allocator, "src/input.txt");
+pub fn p2(allocator: std.mem.Allocator, input_file: []const u8) !i32 {
+    const a = try io.read_input(allocator, input_file);
     defer allocator.free(a);
     var l1 = std.ArrayList(i32).init(allocator);
     var l2 = std.ArrayList(i32).init(allocator);
