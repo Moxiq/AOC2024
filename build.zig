@@ -26,7 +26,7 @@ pub fn build(b: *std.Build) !void {
             const main_path = b.fmt("{s}/main.zig", .{day_path});
 
             // Check if main.zig exists in the day directory
-            try src_dir.access(b.fmt("{s}/main.zig", .{entry.name}), .{});
+            src_dir.access(b.fmt("{s}/main.zig", .{entry.name}), .{}) catch continue;
 
             // Create executable
             const exe = b.addExecutable(.{

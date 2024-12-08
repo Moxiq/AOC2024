@@ -72,45 +72,44 @@ pub fn p2(allocator: std.mem.Allocator, input_file: []const u8) !i32 {
         var lvls = std.mem.splitAny(u8, entry, " ");
         while (lvls.next()) |lvl| {
             const num: i32 = try std.fmt.parseInt(i32, lvl, 10);
-
             try lvl_list.append(num);
         }
-        if (try check_ign(&lvl_list, false)) {
+        const safe = check_safe(lvl_list);
+        if (safe) {
             safe_levels += 1;
+        } else {
+            // Test each index
+            for (0..lvl_list.items.len) |i| {
+                var cpylist = try lvl_list.clone();
+                defer cpylist.deinit();
+                _ = cpylist.orderedRemove(i);
+                if (check_safe(cpylist)) {
+                    safe_levels += 1;
+                    break;
+                }
+            }
         }
     }
 
     return safe_levels;
 }
 
-pub fn check_ign(lvl_list: *const std.ArrayList(i32), ign: bool) !bool {
+fn check_safe(lvl_list: std.ArrayList(i32)) bool {
     for (lvl_list.items, 0..lvl_list.items.len) |lvl, i| {
         if (i == 0) continue;
 
         const diff = @abs(lvl - lvl_list.items[i - 1]);
         if (diff < 1 or diff > 3) {
-            if (ign) return false;
-            var ign_list = try lvl_list.clone();
-            defer ign_list.deinit();
-            _ = ign_list.orderedRemove(i);
-            return check_ign(&ign_list, true);
+            return false;
         }
 
         // Check inc/dec
         if (i >= 2) {
             if ((lvl_list.items[i - 2] > lvl_list.items[i - 1]) and (lvl_list.items[i - 1] < lvl_list.items[i])) {
-                if (ign) return false;
-                var ign_list = try lvl_list.clone();
-                defer ign_list.deinit();
-                _ = ign_list.orderedRemove(i);
-                return check_ign(&ign_list, true);
+                return false;
             }
             if ((lvl_list.items[i - 2] < lvl_list.items[i - 1]) and (lvl_list.items[i - 1] > lvl_list.items[i])) {
-                if (ign) return false;
-                var ign_list = try lvl_list.clone();
-                defer ign_list.deinit();
-                _ = ign_list.orderedRemove(i);
-                return check_ign(&ign_list, true);
+                return false;
             }
         }
     }
