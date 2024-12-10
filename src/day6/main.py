@@ -23,6 +23,7 @@ def p1():
         for x in range(len(inp[0])):
             if inp[y][x] in dirs:
                 guard = Guard(inp[y][x], x, y)
+                break
 
 
     while not sim(inp, guard):
@@ -39,31 +40,50 @@ def p1():
 
 def p2():
     inp_initial = [list(x.strip("\n")) for x in inp_lines()]
+    loop_initial = [[[] for _ in range(len(inp_initial[0]))] for _ in range(len(inp_initial))]
 
     guard_initial = None
     #Find guard initial
-    for y in range(len(inp)):
-        for x in range(len(inp[0])):
-            if inp[y][x] in dirs:
-                guard_initial = Guard(inp[y][x], x, y)
+    for y in range(len(inp_initial)):
+        for x in range(len(inp_initial[0])):
+            if inp_initial[y][x] in dirs:
+                guard_initial = Guard(inp_initial[y][x], x, y)
+                break
 
-
-    # The guard is stuck if it is in a previous position with the same dir
+    result = 0
     # Place obstacle for every position
-    for y in range(len(inp)):
-        for x in range(len(inp[0])):
+    for y in range(len(inp_initial)):
+        for x in range(len(inp_initial[0])):
             # Ignore already places obstacles or guard initial pos
-            if inp[y][x] == '#' or (y == guard_initial.y and guard_initial.x == x):
+            if inp_initial[y][x] == '#' or (y == guard_initial.y and guard_initial.x == x):
                 continue
+            print("{:.1f}%".format(100*(y*len(inp_initial)+x)/(len(inp_initial[0])*len(inp_initial))))
             inp = copy.deepcopy(inp_initial)
             guard = copy.deepcopy(guard_initial)
+            loop = copy.deepcopy(loop_initial)
             inp[y][x] = '#'
 
+            while True:
+                simres = sim(inp, guard, loop)
+                if simres == 2:
+                    result += 1
+                    print(f"res found at {x, y}")
+                    break
+                if simres == 1:
+                    break
 
-    return 42
+    return result
 
 # returns true if outside grid
-def sim(grid, guard: Guard) -> bool:
+def sim(grid, guard: Guard, loop=None) -> int:
+    # Check if we are in a loop
+    # The guard is stuck if it is in a previous position with the same dir
+    if loop:
+        if guard.dir in loop[guard.y][guard.x]:
+            return 2
+        # Add guard dir and pos to loop
+        loop[guard.y][guard.x].append(guard.dir)
+
     # Mark current pos as X
     grid[guard.y][guard.x] = 'X'
 
@@ -72,7 +92,7 @@ def sim(grid, guard: Guard) -> bool:
 
     # Check if outside 
     if newx >= len(grid[0]) or newy >= len(grid) or newx < 0 or newy < 0:
-        return True
+        return 1
 
     # Update guard position
     if grid[newy][newx] == '#':
@@ -87,7 +107,7 @@ def sim(grid, guard: Guard) -> bool:
     guard.x = newx
     guard.y = newy
 
-    return False
+    return 0
 
 def get_next_dir(dir):
     return dirs[(dirs.index(dir) + 1) % len(dirs)] 
