@@ -87,21 +87,20 @@ def sim(grid, guard: Guard, loop=None) -> int:
     # Mark current pos as X
     grid[guard.y][guard.x] = 'X'
 
-    dx,dy = get_dxdy(guard.dir)
-    newx, newy = guard.x+dx, guard.y+dy
+    newx, newy = None, None
 
-    # Check if outside 
-    if newx >= len(grid[0]) or newy >= len(grid) or newx < 0 or newy < 0:
-        return 1
-
-    # Update guard position
-    if grid[newy][newx] == '#':
-        # Update direction on obstacle
-        guard.dir = get_next_dir(guard.dir)
-    
-    # Possible new dir
-    dx,dy = get_dxdy(guard.dir)
-    newx, newy = guard.x+dx, guard.y+dy
+    # Find next step by rotating right until no obstacle in front
+    while True:
+        dx,dy = get_dxdy(guard.dir)
+        newx, newy = guard.x+dx, guard.y+dy
+        # Check if outside 
+        if newx >= len(grid[0]) or newy >= len(grid) or newx < 0 or newy < 0:
+            return 1
+        if grid[newy][newx] != '#':
+            break
+        else:
+            # Update direction on obstacle
+            guard.dir = get_next_dir(guard.dir)
 
     # Step forward
     guard.x = newx
