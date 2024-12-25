@@ -5,7 +5,7 @@ import numpy as np
 import copy
 import itertools
 
-input = f"{pathlib.Path(__file__).parent.resolve()}/tinput.txt"
+input = f"{pathlib.Path(__file__).parent.resolve()}/input.txt"
 
 def p1():
     inp = inp_line().strip("\n")
@@ -63,33 +63,41 @@ def p2():
         map.append(Entry(id, size_file))
         map.append(Entry('.', free_space))
 
-    print(map)
-
-    for (i, bw) in reversed(list(enumerate(map))):
+    for i in range(len(map)-1, -1, -1):
+        bw = map[i]
         if bw.id == '.':
             continue
-        for (j, fw) in enumerate(map):
+        for j in range(len(map)):
+            fw = map[j]
+            if j >= i:
+                break
             if fw.id == '.' and fw.size >= bw.size:
                 tmp = copy.deepcopy(bw)
                 bw.id = fw.id
-                bw.size = fw.size
                 fw.size = fw.size - tmp.size
                 map.insert(j, Entry(tmp.id, tmp.size))
                 break
 
-    print(map)
-
     res = 0
-    id = 0
+    pos = 0
     for i,v in enumerate(map):
-        if v.id == '.' and v.size > 0:
-            break
         if v.id != '.':
-            res += id*int(v)
-            id += 1
+            for file in range(v.size):
+                res += pos * v.id
+                pos += 1
+        else:
+            pos += v.size
 
     return res
 
+def printp2(map):
+    res = list()
+    for i, e in enumerate(map):
+        if e.size == 0:
+            continue
+        res.append(e.size * str(e.id))
+
+    print(''.join(res))
 
 def inp_lines():
     return open(input, 'r').readlines();
