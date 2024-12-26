@@ -12,7 +12,6 @@ def p1():
     inp = [[int(y) for y in (list(x.strip("\n")))] for x in inp_lines()]
 
     res = 0
-    # TODO: Recursive method
     for x in range(len(inp[0])):
         for y in range(len(inp)):
             visited = set()
@@ -27,7 +26,6 @@ def p2():
     inp = [[int(y) for y in (list(x.strip("\n")))] for x in inp_lines()]
 
     res = 0
-    # TODO: Recursive method
     for x in range(len(inp[0])):
         for y in range(len(inp)):
             if inp[x][y] != 0:
