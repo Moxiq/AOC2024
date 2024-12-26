@@ -44,11 +44,12 @@ def recurse_path(grid, x, y, visited):
     if grid[x][y] == 9:
         return sum + 1
     for dir in dirs:
-        if x + dir[0] >= len(grid[y]) or x + dir[0] < 0 or y + dir[1] >= len(grid) or y + dir[1] < 0:
+        newx, newy = x + dir[0], y + dir[1]
+        if newx >= len(grid[y]) or newx < 0 or newy >= len(grid) or newy < 0:
             continue
         if grid[x+dir[0]][y+dir[1]] - grid[x][y] != 1:
             continue
-        sum += recurse_path(grid, x+dir[0], y+dir[1], visited)
+        sum += recurse_path(grid, newx, newy, visited)
 
     return sum
 
