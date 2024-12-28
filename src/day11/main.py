@@ -11,7 +11,6 @@ def p1():
     inp = [int(x) for x in inp_line().strip("\n").split(' ')]
     BLINKS = 25
 
-    print(' '.join([str(x) for x in inp]))
     for i in range(BLINKS):
         print(f"{i}/{BLINKS}")
         inp = blink(inp)
@@ -20,20 +19,10 @@ def p1():
 
 def p2():
     inp = [int(x) for x in inp_line().strip("\n").split(' ')]
-    BLINKS = 25
+    BLINKS = 75
 
-    print(' '.join([str(x) for x in inp]))
-    incs = list()
-    last = 1
-    for i in range(BLINKS):
-        inp = blink(inp)
-        if i != 0:
-            incs.append(len(inp)/last)
-        last = len(inp)
-
-    print(f"avg inc: {sum(incs)/len(incs)}")
-
-    return len(inp)
+    memo = blink_p2(inp, BLINKS)
+    return sum(memo.values())
 
 def blink(stones):
     to_add = list()
@@ -53,6 +42,39 @@ def blink(stones):
         stones.insert(v[0], v[1])
 
     return stones
+
+# TODO
+# Create a map that contains the count of stone with a specific number.
+# When new stones come in, check if there is any match and add to the count if so, else, add new entry with 1
+# Go through the map and append/delete entries based on each stone and their count, count times
+# In the end, we can just sum up the counts for each entry in the map
+def blink_p2(stones, iter):
+    memo = {}
+    [memo.update({x: stones.count(x)}) for x in stones]
+
+    for it in range(iter):
+        for stone, count in copy.deepcopy(memo).items():
+            to_add = []
+            if stone == 0:
+                to_add.append(1)
+            elif len(str(stone)) % 2 == 0:
+                strstone = str(stone)
+                ls = int(strstone[:len(strstone)//2])
+                rs = int(strstone[len(strstone)//2:])
+                to_add.extend((ls, rs))
+            else:
+                to_add.append(stone*2024)
+
+            memo[stone] -= count
+            for add in to_add:
+                if add in memo:
+                    memo[add] += count
+                else:
+                    memo[add] = count
+            if memo[stone] <= 0:  # It is probably faster to do operations on counts > 0 instead of removing
+                memo.pop(stone)
+
+    return memo
 
 def inp_lines():
     return open(input, 'r').readlines()
