@@ -54,6 +54,8 @@ def blink_p2(stones, iter):
 
     for it in range(iter):
         for stone, count in copy.deepcopy(memo).items():
+            if count <= 0:
+                continue
             to_add = []
             if stone == 0:
                 to_add.append(1)
@@ -71,8 +73,6 @@ def blink_p2(stones, iter):
                     memo[add] += count
                 else:
                     memo[add] = count
-            if memo[stone] <= 0:  # It is probably faster to do operations on counts > 0 instead of removing
-                memo.pop(stone)
 
     return memo
 
